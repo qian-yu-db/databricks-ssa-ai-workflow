@@ -1,0 +1,11 @@
+{
+  "name": "asq-automation",
+  "description": "Automate ASQ lifecycle: intake from Salesforce, autonomous research, architecture design, status sync, and time tracking",
+  "version": "1.0.0",
+  "author": {
+    "name": "Q Yu"
+  },
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "agents": "./agents/"
+}
