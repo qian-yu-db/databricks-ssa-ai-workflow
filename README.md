@@ -8,7 +8,7 @@ Automate the full ASQ (Approval Request / Specialist SA) lifecycle in Claude Cod
 - Salesforce CLI (`sf`) authenticated
 - MCP servers configured: Glean, Slack, JIRA, Confluence
 - FE plugins: `fe-salesforce-tools`, `fe-google-tools` (for calendar/gmail/docs)
-- Obsidian vault at `~/workspace/databricks_knowledge_vault/`
+- A notes directory (see [Notes Directory Setup](#notes-directory-setup) below)
 
 ## Installation
 
@@ -46,7 +46,7 @@ Then restart Claude Code. The plugin will be fetched from GitHub automatically.
 
 ## How It Works
 
-- **Obsidian = working notes**: Customer notes live in your vault at `02-customers/`
+- **Markdown files = working notes**: Customer notes are plain markdown in `02-customers/` (works with Obsidian, VS Code, or any editor)
 - **Salesforce = system of record**: Hours and status sync back to SF (always with confirmation)
 - **Research is autonomous**: The `/asq-research` agent searches Glean, Slack, and web in parallel
 - **Everything is additive**: Commands add sections to notes, never overwrite existing content
@@ -69,11 +69,68 @@ skills/
     resources/vault-paths.md        # Vault path constants
 ```
 
+## Notes Directory Setup
+
+This plugin stores customer notes as **plain markdown files** — no special tools required. You can browse them with Obsidian, VS Code, or any text editor.
+
+### Required folder structure
+
+Create this directory structure wherever you like (default: `~/workspace/databricks_knowledge_vault/`):
+
+```
+your-notes-directory/
+├── 02-customers/              # Customer engagement notes (created by /asq-intake)
+├── 30-templates/
+│   └── customer-note.md       # Customer note template
+└── 50-logs/                   # Weekly activity & time logs
+    └── 2026/                  # Auto-created per year
+```
+
+**Quick setup (copy-paste):**
+
+```bash
+# Set your preferred path (change this to wherever you want)
+NOTES_DIR=~/workspace/databricks_knowledge_vault
+
+mkdir -p "$NOTES_DIR"/{02-customers,30-templates,50-logs}
+```
+
+### Customer note template
+
+Create `30-templates/customer-note.md` with the base template. You can copy the one from this repo or create your own — the plugin will use it as a starting point and add ASQ-specific fields automatically.
+
+A minimal template:
+
+```markdown
+---
+type: customer
+customer_name: {{title}}
+status: status/active
+created: {{date:YYYY-MM-DD}}
+last_updated: {{date:YYYY-MM-DD}}
+---
+
+# {{title}}
+
+## ASQ Summary
+
+## Key Stakeholders
+| Name | Role | Notes |
+|------|------|-------|
+
+## Engagement History
+| Date | Type | Summary | Action Items |
+|------|------|---------|--------------|
+
+## Open Items
+- [ ]
+```
+
+### Using a different directory
+
+If your notes directory is **not** at `~/workspace/databricks_knowledge_vault/`, update the path in `skills/asq-lifecycle/resources/vault-paths.md` and `skills/asq-lifecycle/SKILL.md`. Both files reference the vault root path.
+
 ## Customization
-
-### Vault Paths
-
-Edit `skills/asq-lifecycle/resources/vault-paths.md` to change vault locations if your Obsidian vault is at a different path.
 
 ### Salesforce Fields
 
