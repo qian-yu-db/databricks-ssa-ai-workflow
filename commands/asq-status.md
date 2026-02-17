@@ -16,13 +16,20 @@ Gather recent activity from Slack, Calendar, and Gmail for an ASQ engagement, up
 
 ## Workflow
 
+### 0. Resolve Paths
+
+Read `~/.claude/CLAUDE.md` and look for an `## ASQ Notes Configuration` section. If found, use those paths. Otherwise use defaults:
+- `ASQ_NOTES_ROOT`: `~/asq-notes`
+- `CUSTOMERS_DIR`: `customers/`
+- `LOGS_DIR`: `logs/`
+
 ### 1. Parse AR ID
 
 Extract the AR ID from the argument. Accept formats: `AR-000106904` or `000106904` (auto-prefix AR-).
 
 ### 2. Find and Read Customer Note
 
-Use Glob to find `customer-*-AR-{ID}.md` in `~/workspace/databricks_knowledge_vault/02-customers/`.
+Use Glob to find `customer-*-AR-{ID}.md` in `{ASQ_NOTES_ROOT}/{CUSTOMERS_DIR}`.
 
 If not found, tell the user:
 > No customer note found for {AR ID}. Run `/asq-intake {AR ID}` first.
@@ -100,7 +107,7 @@ Update `last_updated` in frontmatter to today's date.
 ### 5. Update Weekly Log
 
 Determine current ISO week. Create or update the weekly log at:
-`~/workspace/databricks_knowledge_vault/50-logs/{YYYY}/{YYYY}-W{XX}.md`
+`{ASQ_NOTES_ROOT}/{LOGS_DIR}/{YYYY}/{YYYY}-W{XX}.md`
 
 Create the directory if needed. Append an entry:
 
@@ -119,7 +126,7 @@ Compose a concise status update for the `Request_Status_Notes__c` field based on
 - Key outcomes or decisions
 - Next steps
 
-Format as a dated entry that can be appended:
+Format as a dated entry:
 ```
 {YYYY-MM-DD}: {Concise status summary. Key activities, outcomes, and next steps.}
 ```

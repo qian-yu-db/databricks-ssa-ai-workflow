@@ -16,13 +16,19 @@ Design a Databricks solution architecture for an ASQ engagement, generate a merm
 
 ## Workflow
 
+### 0. Resolve Paths
+
+Read `~/.claude/CLAUDE.md` and look for an `## ASQ Notes Configuration` section. If found, use those paths. Otherwise use defaults:
+- `ASQ_NOTES_ROOT`: `~/asq-notes`
+- `CUSTOMERS_DIR`: `customers/`
+
 ### 1. Parse AR ID
 
 Extract the AR ID from the argument. Accept formats: `AR-000106904` or `000106904` (auto-prefix AR-).
 
 ### 2. Find and Read Customer Note
 
-Use Glob to find `customer-*-AR-{ID}.md` in `~/workspace/databricks_knowledge_vault/02-customers/`.
+Use Glob to find `customer-*-AR-{ID}.md` in `{ASQ_NOTES_ROOT}/{CUSTOMERS_DIR}`.
 
 If not found, tell the user:
 > No customer note found for {AR ID}. Run `/asq-intake {AR ID}` first.
@@ -68,7 +74,7 @@ For each layer, document:
 
 Create a mermaid diagram showing the architecture. Extract the company code from the filename (e.g., TRV from customer-TRV-AR-000106904.md).
 
-Save as `customer-{CODE}-AR-{ID}-architecture.mermaid` in the same directory as the customer note (`~/workspace/databricks_knowledge_vault/02-customers/`).
+Save as `customer-{CODE}-AR-{ID}-architecture.mermaid` in the same directory as the customer note.
 
 Use a flowchart (graph TD or graph LR) with clear grouping:
 
@@ -120,12 +126,7 @@ graph TD
     MS --> APP
 ```
 
-Customize the diagram based on the actual requirements. Include:
-- All relevant data sources
-- Specific Databricks services (not generic boxes)
-- Data flow direction with arrows
-- Grouping by logical layer
-- External integrations
+Customize the diagram based on the actual requirements.
 
 ### 6. Add Architecture Section to Customer Note
 
@@ -154,13 +155,9 @@ Use the Edit tool to add an `## Architecture` section to the customer note. Plac
 - **Sizing**: {recommendations}
 - **Notes**: {important considerations}
 
-#### {Layer/Component 2}
-...
-
 ### Scalability & Performance
 - {Key scalability consideration 1}
 - {Key performance recommendation 1}
-- {Growth path and future considerations}
 
 ### Architecture Diagram
 See: [[customer-{CODE}-AR-{ID}-architecture.mermaid]]
@@ -174,4 +171,3 @@ Display to the user:
 - Key components: {list of main Databricks services}
 - Design decisions: {count}
 - Note updated with Architecture section
-- Remind user to review the mermaid diagram in Obsidian (rendered with mermaid plugin)

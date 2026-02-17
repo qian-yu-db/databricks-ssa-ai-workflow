@@ -16,6 +16,12 @@ Launch autonomous multi-source research for an ASQ engagement. Searches Glean, S
 
 ## Workflow
 
+### 0. Resolve Paths
+
+Read `~/.claude/CLAUDE.md` and look for an `## ASQ Notes Configuration` section. If found, use those paths. Otherwise use defaults:
+- `ASQ_NOTES_ROOT`: `~/asq-notes`
+- `CUSTOMERS_DIR`: `customers/`
+
 ### 1. Parse AR ID
 
 Extract the AR ID from the argument. Accept formats: `AR-000106904` or `000106904` (auto-prefix AR-).
@@ -24,7 +30,7 @@ Extract the AR ID from the argument. Accept formats: `AR-000106904` or `00010690
 
 Use Glob to find the customer note:
 ```
-Glob for customer-*-AR-{ID}.md in ~/workspace/databricks_knowledge_vault/02-customers/
+Glob for customer-*-AR-{ID}.md in {ASQ_NOTES_ROOT}/{CUSTOMERS_DIR}
 ```
 
 If not found, tell the user:
@@ -86,5 +92,5 @@ Display to the user:
 
 - Research is **additive** - it adds a Research Findings section without modifying existing content
 - If Research Findings already exists, the agent will update/replace it with fresh findings
-- The agent runs autonomously but all changes are to the local Obsidian vault (no external writes)
+- The agent runs autonomously but all changes are to local notes (no external writes)
 - Research typically takes 1-3 minutes depending on the breadth of sources found

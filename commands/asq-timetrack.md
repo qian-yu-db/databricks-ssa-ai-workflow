@@ -17,11 +17,18 @@ No arguments needed. Automatically finds all active ASQs.
 
 ## Workflow
 
+### 0. Resolve Paths
+
+Read `~/.claude/CLAUDE.md` and look for an `## ASQ Notes Configuration` section. If found, use those paths. Otherwise use defaults:
+- `ASQ_NOTES_ROOT`: `~/asq-notes`
+- `CUSTOMERS_DIR`: `customers/`
+- `LOGS_DIR`: `logs/`
+
 ### 1. Find Active ASQs
 
 Search for all active customer notes:
 
-1. Use Glob to find all `customer-*-AR-*.md` files in `~/workspace/databricks_knowledge_vault/02-customers/`
+1. Use Glob to find all `customer-*-AR-*.md` files in `{ASQ_NOTES_ROOT}/{CUSTOMERS_DIR}`
 2. Read each file's frontmatter
 3. Filter to only notes where `status: status/active`
 4. Extract from each: AR ID (from `asq_id` frontmatter), customer name, company code
@@ -31,7 +38,7 @@ If no active ASQs found, inform the user and stop.
 ### 2. Read Weekly Log
 
 Determine the current ISO week number and year. Check if a weekly log exists at:
-`~/workspace/databricks_knowledge_vault/50-logs/{YYYY}/{YYYY}-W{XX}.md`
+`{ASQ_NOTES_ROOT}/{LOGS_DIR}/{YYYY}/{YYYY}-W{XX}.md`
 
 If it exists, read it for any already-logged time entries this week.
 
@@ -88,7 +95,7 @@ sf data update record -s ApprovalRequest__c -i {SF_RECORD_ID} -v "Hours_Consumed
 
 ### 8. Save to Weekly Log
 
-Append or create the weekly log entry at `~/workspace/databricks_knowledge_vault/50-logs/{YYYY}/{YYYY}-W{XX}.md`:
+Append or create the weekly log entry at `{ASQ_NOTES_ROOT}/{LOGS_DIR}/{YYYY}/{YYYY}-W{XX}.md`:
 
 ```markdown
 ## Time Summary - Week {XX}

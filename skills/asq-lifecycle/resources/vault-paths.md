@@ -1,15 +1,15 @@
-# Vault Path Constants
+# ASQ Notes Path Configuration
 
-Reference for all paths used by ASQ automation commands.
+Reference for all paths used by ASQ automation commands. Paths can be overridden in your personal `CLAUDE.md` file.
 
 ## Base Paths
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| VAULT_ROOT | `~/workspace/databricks_knowledge_vault` | Obsidian vault root |
-| CUSTOMERS_DIR | `02-customers/` | Customer engagement notes |
-| TEMPLATES_DIR | `30-templates/` | Note templates |
-| LOGS_DIR | `50-logs/` | Activity and time logs |
+| Constant | Default | Description |
+|----------|---------|-------------|
+| ASQ_NOTES_ROOT | `~/asq-notes` | Root directory for all ASQ notes |
+| CUSTOMERS_DIR | `customers/` | Customer engagement notes |
+| TEMPLATES_DIR | `templates/` | Note templates |
+| LOGS_DIR | `logs/` | Activity and time logs |
 
 ## File Patterns
 
@@ -23,15 +23,29 @@ Reference for all paths used by ASQ automation commands.
 
 | Resource | Full Path |
 |----------|-----------|
-| Customer note | `~/workspace/databricks_knowledge_vault/02-customers/customer-{CODE}-AR-{ID}.md` |
-| Architecture diagram | `~/workspace/databricks_knowledge_vault/02-customers/customer-{CODE}-AR-{ID}-architecture.mermaid` |
-| Template | `~/workspace/databricks_knowledge_vault/30-templates/customer-note.md` |
-| Weekly log | `~/workspace/databricks_knowledge_vault/50-logs/YYYY/YYYY-WXX.md` |
+| Customer note | `{ASQ_NOTES_ROOT}/customers/customer-{CODE}-AR-{ID}.md` |
+| Architecture diagram | `{ASQ_NOTES_ROOT}/customers/customer-{CODE}-AR-{ID}-architecture.mermaid` |
+| Template | `{ASQ_NOTES_ROOT}/templates/customer-note.md` |
+| Weekly log | `{ASQ_NOTES_ROOT}/logs/YYYY/YYYY-WXX.md` |
+
+## Overriding Paths
+
+If your directory structure differs from the defaults, add this to your `~/.claude/CLAUDE.md`:
+
+```markdown
+## ASQ Notes Configuration
+- ASQ_NOTES_ROOT: ~/my/custom/path
+- CUSTOMERS_DIR: my-customers/
+- TEMPLATES_DIR: my-templates/
+- LOGS_DIR: my-logs/
+```
+
+The plugin will use these overrides when present in CLAUDE.md.
 
 ## Company Code Derivation
 
 1. Take the account name from Salesforce `Account__r.Name`
 2. Create a 2-4 letter uppercase abbreviation (e.g., Travelers → TRV, Acme Corp → ACME)
-3. **Always check existing files** in `02-customers/` first: `ls ~/workspace/databricks_knowledge_vault/02-customers/customer-*` to see what codes are already in use
+3. **Always check existing files** in the customers directory first to see what codes are already in use
 4. If the account already has notes with a code, reuse that code
 5. Store derived codes in the customer note frontmatter for future reference

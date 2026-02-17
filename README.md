@@ -8,9 +8,10 @@ Automate the full ASQ (Approval Request / Specialist SA) lifecycle in Claude Cod
 - Salesforce CLI (`sf`) authenticated
 - MCP servers configured: Glean, Slack, JIRA, Confluence
 - FE plugins: `fe-salesforce-tools`, `fe-google-tools` (for calendar/gmail/docs)
-- A notes directory (see [Notes Directory Setup](#notes-directory-setup) below)
 
 ## Installation
+
+### 1. Enable the plugin
 
 Add to your `~/.claude/settings.json` under `enabledPlugins`:
 
@@ -22,13 +23,78 @@ Add to your `~/.claude/settings.json` under `enabledPlugins`:
 }
 ```
 
-Then restart Claude Code. The plugin will be fetched from GitHub automatically.
+### 2. Set up your notes directory
+
+```bash
+# Set your preferred path (default: ~/asq-notes)
+NOTES_DIR=~/asq-notes
+
+mkdir -p "$NOTES_DIR"/{customers,templates,logs}
+```
+
+### 3. Create the customer note template
+
+Create `templates/customer-note.md` in your notes directory:
+
+```markdown
+---
+type: customer
+customer_name: {{title}}
+status: status/active
+created: {{date:YYYY-MM-DD}}
+last_updated: {{date:YYYY-MM-DD}}
+---
+
+# {{title}}
+
+## ASQ Summary
+
+### Business Context
+- **Industry**:
+- **Company Size**:
+- **Business Challenges**:
+
+### Technical Environment
+- **Cloud Provider**:
+- **Databricks Workspace(s)**:
+- **Key Technologies**:
+
+### Project Scope
+- **Use Case**:
+- **Success Criteria**:
+- **Timeline**:
+
+## Key Stakeholders
+| Name | Role | Notes |
+|------|------|-------|
+
+## Engagement History
+| Date | Type | Summary | Action Items |
+|------|------|---------|--------------|
+
+## Open Items
+- [ ]
+```
+
+### 4. (Optional) Customize paths
+
+If you use a different directory structure, add this to your `~/.claude/CLAUDE.md`:
+
+```markdown
+## ASQ Notes Configuration
+- ASQ_NOTES_ROOT: ~/my/custom/path
+- CUSTOMERS_DIR: customers/
+- TEMPLATES_DIR: templates/
+- LOGS_DIR: logs/
+```
+
+Then restart Claude Code.
 
 ## Commands
 
 | Command | Description | Model |
 |---------|-------------|-------|
-| `/asq-intake AR-XXXXXX` | Pull ASQ from Salesforce, create Obsidian customer note | sonnet |
+| `/asq-intake AR-XXXXXX` | Pull ASQ from Salesforce, create customer note | sonnet |
 | `/asq-research AR-XXXXXX` | Autonomous research across Glean, Slack, and web | opus |
 | `/asq-architecture AR-XXXXXX` | Design solution architecture with mermaid diagram | opus |
 | `/asq-status AR-XXXXXX` | Gather activity from Slack/Calendar/Gmail, sync to SF | sonnet |
@@ -46,17 +112,30 @@ Then restart Claude Code. The plugin will be fetched from GitHub automatically.
 
 ## How It Works
 
-- **Markdown files = working notes**: Customer notes are plain markdown in `02-customers/` (works with Obsidian, VS Code, or any editor)
+- **Markdown files = working notes**: Customer notes are plain markdown in `customers/` (works with any editor)
 - **Salesforce = system of record**: Hours and status sync back to SF (always with confirmation)
 - **Research is autonomous**: The `/asq-research` agent searches Glean, Slack, and web in parallel
 - **Everything is additive**: Commands add sections to notes, never overwrite existing content
+- **Paths are configurable**: Override defaults via `CLAUDE.md` to fit your directory structure
 
-## File Structure
+## Directory Structure
+
+```
+your-notes-dir/              # Default: ~/asq-notes
+├── customers/               # Customer engagement notes (created by /asq-intake)
+├── templates/
+│   └── customer-note.md     # Customer note template
+└── logs/                    # Weekly activity & time logs
+    └── 2026/                # Auto-created per year
+        └── 2026-W07.md
+```
+
+## Plugin Structure
 
 ```
 .claude-plugin/plugin.json          # Plugin manifest
 commands/
-  asq-intake.md                     # SF -> Obsidian note
+  asq-intake.md                     # SF -> customer note
   asq-research.md                   # Launches research agent
   asq-architecture.md               # Solution design + mermaid
   asq-status.md                     # Activity search + SF sync
@@ -66,72 +145,15 @@ agents/
 skills/
   asq-lifecycle/
     SKILL.md                        # Always-loaded ASQ context
-    resources/vault-paths.md        # Vault path constants
+    resources/vault-paths.md        # Path configuration reference
 ```
-
-## Notes Directory Setup
-
-This plugin stores customer notes as **plain markdown files** — no special tools required. You can browse them with Obsidian, VS Code, or any text editor.
-
-### Required folder structure
-
-Create this directory structure wherever you like (default: `~/workspace/databricks_knowledge_vault/`):
-
-```
-your-notes-directory/
-├── 02-customers/              # Customer engagement notes (created by /asq-intake)
-├── 30-templates/
-│   └── customer-note.md       # Customer note template
-└── 50-logs/                   # Weekly activity & time logs
-    └── 2026/                  # Auto-created per year
-```
-
-**Quick setup (copy-paste):**
-
-```bash
-# Set your preferred path (change this to wherever you want)
-NOTES_DIR=~/workspace/databricks_knowledge_vault
-
-mkdir -p "$NOTES_DIR"/{02-customers,30-templates,50-logs}
-```
-
-### Customer note template
-
-Create `30-templates/customer-note.md` with the base template. You can copy the one from this repo or create your own — the plugin will use it as a starting point and add ASQ-specific fields automatically.
-
-A minimal template:
-
-```markdown
----
-type: customer
-customer_name: {{title}}
-status: status/active
-created: {{date:YYYY-MM-DD}}
-last_updated: {{date:YYYY-MM-DD}}
----
-
-# {{title}}
-
-## ASQ Summary
-
-## Key Stakeholders
-| Name | Role | Notes |
-|------|------|-------|
-
-## Engagement History
-| Date | Type | Summary | Action Items |
-|------|------|---------|--------------|
-
-## Open Items
-- [ ]
-```
-
-### Using a different directory
-
-If your notes directory is **not** at `~/workspace/databricks_knowledge_vault/`, update the path in `skills/asq-lifecycle/resources/vault-paths.md` and `skills/asq-lifecycle/SKILL.md`. Both files reference the vault root path.
 
 ## Customization
 
 ### Salesforce Fields
 
 The `SKILL.md` file contains the full SF field reference. Update if your org has custom fields.
+
+### Path Overrides
+
+See `skills/asq-lifecycle/resources/vault-paths.md` for the full path configuration reference and override instructions.

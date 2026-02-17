@@ -1,12 +1,12 @@
 ---
-description: Pull ASQ data from Salesforce and create an Obsidian customer note
+description: Pull ASQ data from Salesforce and create a customer note
 argument-hint: "AR-XXXXXX"
 model: sonnet
 ---
 
 # /asq-intake - Import ASQ from Salesforce
 
-Create a structured Obsidian customer note from Salesforce ASQ (Approval Request) data.
+Create a structured customer note from Salesforce ASQ (Approval Request) data.
 
 ## Usage
 
@@ -15,6 +15,13 @@ Create a structured Obsidian customer note from Salesforce ASQ (Approval Request
 ```
 
 ## Workflow
+
+### 0. Resolve Paths
+
+Read `~/.claude/CLAUDE.md` and look for an `## ASQ Notes Configuration` section. If found, use those paths. Otherwise use defaults:
+- `ASQ_NOTES_ROOT`: `~/asq-notes`
+- `CUSTOMERS_DIR`: `customers/`
+- `TEMPLATES_DIR`: `templates/`
 
 ### 1. Parse AR ID
 
@@ -35,7 +42,7 @@ If the query returns no results, inform the user and stop.
 1. Extract the account name from `Account__r.Name`
 2. Check existing files for this account:
    ```
-   Glob for customer-*-AR-*.md in ~/workspace/databricks_knowledge_vault/02-customers/
+   Glob for customer-*-AR-*.md in {ASQ_NOTES_ROOT}/{CUSTOMERS_DIR}
    ```
 3. If the account already has notes, reuse the existing company code from the filename
 4. If new account, derive a 2-4 letter uppercase code:
@@ -49,11 +56,11 @@ Check if `customer-{CODE}-AR-{ID}.md` already exists. If yes, ask the user wheth
 
 ### 5. Read Template
 
-Read the template from `~/workspace/databricks_knowledge_vault/30-templates/customer-note.md`.
+Read the template from `{ASQ_NOTES_ROOT}/{TEMPLATES_DIR}/customer-note.md`. If the template doesn't exist, use a minimal built-in template.
 
 ### 6. Create Customer Note
 
-Write the note to `~/workspace/databricks_knowledge_vault/02-customers/customer-{CODE}-AR-{ID}.md` with:
+Write the note to `{ASQ_NOTES_ROOT}/{CUSTOMERS_DIR}/customer-{CODE}-AR-{ID}.md` with:
 
 **Frontmatter** (extend template frontmatter):
 ```yaml

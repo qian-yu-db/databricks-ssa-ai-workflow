@@ -1,27 +1,38 @@
 ---
 name: asq-lifecycle
-description: "Use this skill for ANY mention of ASQ, AR tickets, approval requests, or specialist SA engagements. Triggers on: 'ASQ', 'AR-', 'approval request', 'specialist request', 'asq-intake', 'asq-research', 'asq-architecture', 'asq-status', 'asq-timetrack'. Provides context about ASQ lifecycle management, Salesforce fields, vault paths, and integration patterns."
+description: "Use this skill for ANY mention of ASQ, AR tickets, approval requests, or specialist SA engagements. Triggers on: 'ASQ', 'AR-', 'approval request', 'specialist request', 'asq-intake', 'asq-research', 'asq-architecture', 'asq-status', 'asq-timetrack'. Provides context about ASQ lifecycle management, Salesforce fields, note paths, and integration patterns."
 ---
 
 # ASQ Lifecycle Management
 
-Core context for managing ASQ (Approval Request / Specialist SA) engagements across Salesforce, Obsidian vault, and communication tools.
+Core context for managing ASQ (Approval Request / Specialist SA) engagements across Salesforce, local notes, and communication tools.
 
-## Vault Structure
+## Notes Directory Structure
+
+**IMPORTANT: Check the user's `CLAUDE.md` for an `## ASQ Notes Configuration` section.** If present, use those paths instead of the defaults below.
+
+### Default Paths
 
 | Path | Purpose |
 |------|---------|
-| `~/workspace/databricks_knowledge_vault/` | Vault root |
-| `02-customers/` | Customer engagement notes |
-| `30-templates/customer-note.md` | Customer note template |
-| `50-logs/YYYY/YYYY-WXX.md` | Weekly activity logs |
+| `~/asq-notes/` | Notes root (override via CLAUDE.md `ASQ_NOTES_ROOT`) |
+| `customers/` | Customer engagement notes (override via `CUSTOMERS_DIR`) |
+| `templates/customer-note.md` | Customer note template (override via `TEMPLATES_DIR`) |
+| `logs/YYYY/YYYY-WXX.md` | Weekly activity logs (override via `LOGS_DIR`) |
+
+### Path Resolution
+
+Before using any path, check `~/.claude/CLAUDE.md` for overrides:
+1. Look for `## ASQ Notes Configuration` section
+2. If found, use the specified `ASQ_NOTES_ROOT`, `CUSTOMERS_DIR`, `TEMPLATES_DIR`, `LOGS_DIR`
+3. If not found, use defaults: `~/asq-notes/`, `customers/`, `templates/`, `logs/`
 
 ### Note Naming Convention
 
 `customer-{CODE}-AR-{ID}.md` where:
 - `{CODE}` = uppercase 2-4 letter abbreviation derived from account name (e.g., Travelers → TRV, Acme Corp → ACME)
 - `{ID}` = AR number (e.g., 000106904)
-- Always check existing files in `02-customers/` for reuse of existing company codes before creating new ones
+- Always check existing files in the customers directory for reuse of existing company codes before creating new ones
 
 ## Salesforce ApprovalRequest__c Key Fields
 
@@ -101,6 +112,6 @@ hours_consumed: X
 ## Safety Rules
 
 1. **SF writes require user confirmation** - Never update Salesforce without showing the planned change and getting explicit approval
-2. **Obsidian is source of truth for notes** - Customer notes live in the vault, SF has metadata
+2. **Local notes are source of truth** - Customer notes live in the notes directory, SF has metadata
 3. **Research is additive** - Research findings append to notes, never overwrite existing content
 4. **Company codes are stable** - Once a code is assigned to an account, always reuse it
