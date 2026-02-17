@@ -1,6 +1,6 @@
 ---
 description: Update ASQ status from Slack/Calendar/Gmail activity and sync to Salesforce
-argument-hint: "AR-XXXXXX"
+argument-hint: "AR-XXXXXX [--days N]"
 model: sonnet
 ---
 
@@ -12,6 +12,7 @@ Gather recent activity from Slack, Calendar, and Gmail for an ASQ engagement, up
 
 ```
 /asq-status AR-000106904
+/asq-status AR-000106904 --days 14
 ```
 
 ## Workflow
@@ -23,9 +24,14 @@ Read `~/.claude/CLAUDE.md` and look for an `## ASQ Notes Configuration` section.
 - `CUSTOMERS_DIR`: `customers/`
 - `LOGS_DIR`: `logs/`
 
-### 1. Parse AR ID
+### 1. Parse Arguments
 
 Extract the AR ID from the argument. Accept formats: `AR-000106904` or `000106904` (auto-prefix AR-).
+
+Parse optional `--days N` flag to set the lookback window. Default: **7 days**. Examples:
+- `/asq-status AR-000106904` → 7 days
+- `/asq-status AR-000106904 --days 14` → 14 days
+- `/asq-status AR-000106904 --days 30` → 30 days
 
 ### 2. Find and Read Customer Note
 
@@ -41,9 +47,9 @@ Read the note and extract:
 - Current open items
 - Last updated date from frontmatter
 
-### 3. Search Recent Activity (Last 2 Weeks)
+### 3. Search Recent Activity
 
-Calculate the date range: today minus 14 days to today.
+Calculate the date range: today minus `{days}` days (default 7) to today.
 
 #### 3a. Search Slack
 
@@ -64,7 +70,7 @@ Also search for the customer name if different from account name. Look for:
 
 Use the `fe-google-tools:google-calendar` skill to find meetings:
 - Search for meetings with customer name in title or attendees
-- Look at the last 2 weeks
+- Look at the last `{days}` days
 - Extract meeting titles, dates, and attendees
 
 #### 3c. Search Gmail
@@ -72,7 +78,7 @@ Use the `fe-google-tools:google-calendar` skill to find meetings:
 Use the `fe-google-tools:gmail` skill to search:
 - Emails to/from customer contacts
 - Emails mentioning the account name or AR ID
-- Look at the last 2 weeks
+- Look at the last `{days}` days
 - Extract key correspondence summaries
 
 #### 3d. Search Google Docs (Optional)
