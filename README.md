@@ -97,7 +97,7 @@ Then restart Claude Code.
 | `/asq-intake AR-XXXXXX` | Pull ASQ from Salesforce, create customer note | sonnet |
 | `/asq-research AR-XXXXXX` | Autonomous research across Glean, Slack, and web | opus |
 | `/asq-architecture AR-XXXXXX` | Design solution architecture with mermaid diagram | opus |
-| `/asq-status AR-XXXXXX` | Gather activity from Slack/Calendar/Gmail, sync to SF | sonnet |
+| `/asq-status AR-XXXXXX [--days N]` | Gather activity from Slack/Calendar/Gmail, sync to SF (default: 7 days) | sonnet |
 | `/asq-timetrack` | Weekly time summary across all active ASQs | sonnet |
 
 ## Typical Workflow
@@ -106,7 +106,8 @@ Then restart Claude Code.
 1. /asq-intake AR-000106904        # Create customer note from Salesforce
 2. /asq-research AR-000106904      # Research the engagement topic
 3. /asq-architecture AR-000106904  # Design the solution
-4. /asq-status AR-000106904        # Weekly status updates
+4. /asq-status AR-000106904        # Status update (last 7 days)
+   /asq-status AR-000106904 --days 14  # Or look back further
 5. /asq-timetrack                  # End-of-week time sync
 ```
 
