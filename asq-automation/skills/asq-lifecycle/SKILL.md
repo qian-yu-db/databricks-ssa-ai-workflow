@@ -50,10 +50,8 @@ Before using any path, check `~/.claude/CLAUDE.md` for overrides:
 | `End_Date__c` | Target end date |
 | `Approved_Start_Date__c` | Approved start date |
 | `Approved_End_Date__c` | Approved end date |
-| `Estimated_Duration__c` | Estimated effort in days |
-| `Total_Hours__c` | Formula: total approved hours |
-| `Hours_Consumed__c` | Manually tracked hours used |
-| `Remaining_Hours_of_Investment__c` | Formula: Total - Consumed |
+| `Estimated_Duration__c` | Estimated total effort in days |
+| `Actual_Effort_in_Days__c` | Cumulative days of effort used (updated by /asq-timetrack) |
 | `Requestor__r.Name` | Who requested |
 | `Resource__r.Name` | Assigned SSA |
 | `Urgency__c` | Priority level |
@@ -65,19 +63,20 @@ Before using any path, check `~/.claude/CLAUDE.md` for overrides:
 | Field | Description |
 |-------|-------------|
 | `Request_Status_Notes__c` | Free-text status notes (updated by /asq-status) |
-| `Hours_Consumed__c` | Hours used (updated by /asq-timetrack) |
+| `Actual_Effort_in_Days__c` | Cumulative effort in days (updated by /asq-timetrack). New value = current + this week's days. ALWAYS confirm with user before updating. |
 
 ### Common Queries
 
 ```bash
 # Get ASQ by AR number
-sf data query -q "SELECT Id, Name, Status__c, Request_Type__c, Support_Type__c, Urgency__c, Request_Description__c, Situation_Details__c, Start_Date__c, End_Date__c, Estimated_Duration__c, Hours_Consumed__c, Total_Hours__c, Remaining_Hours_of_Investment__c, Account__r.Name, Requestor__r.Name, Resource__r.Name, Approved_Start_Date__c, Approved_End_Date__c, Approved_Investment_Per_Period__c, Approved_Frequency__c, EngagementType__c FROM ApprovalRequest__c WHERE Name = 'AR-XXXXXX'" --json
+sf data query -q "SELECT Id, Name, Status__c, Request_Type__c, Support_Type__c, Urgency__c, Request_Description__c, Situation_Details__c, Start_Date__c, End_Date__c, Estimated_Duration__c, Actual_Effort_in_Days__c, Account__r.Name, Requestor__r.Name, Resource__r.Name, Approved_Start_Date__c, Approved_End_Date__c, Approved_Investment_Per_Period__c, Approved_Frequency__c, EngagementType__c FROM ApprovalRequest__c WHERE Name = 'AR-XXXXXX'" --json
 
 # Update status notes (ALWAYS confirm with user first)
 sf data update record -s ApprovalRequest__c -w "Name='AR-XXXXXX'" -v "Request_Status_Notes__c='Status update text'"
 
-# Update hours consumed (ALWAYS confirm with user first)
-sf data update record -s ApprovalRequest__c -i {SF_RECORD_ID} -v "Hours_Consumed__c={hours}"
+# Update actual effort in days (ALWAYS confirm with user first)
+# new_value = current Actual_Effort_in_Days__c + this_week_days
+sf data update record -s ApprovalRequest__c -i {SF_RECORD_ID} -v "Actual_Effort_in_Days__c={new_value}"
 ```
 
 ## Extended Frontmatter for Customer Notes
@@ -89,9 +88,8 @@ asq_id: AR-XXXXXX
 support_type: Production Architecture Review & Design
 start_date: YYYY-MM-DD
 end_date: YYYY-MM-DD
-estimated_days: X
-total_hours: X
-hours_consumed: X
+estimated_days_total: X
+actual_effort_days: X
 ```
 
 ## Integration Patterns

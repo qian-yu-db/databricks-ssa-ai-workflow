@@ -1,11 +1,11 @@
 ---
-description: Weekly time summary and Salesforce hours sync for active ASQs
+description: Weekly time summary and Salesforce days sync for active ASQs
 model: sonnet
 ---
 
 # /asq-timetrack - Time Tracking Summary
 
-Generate a weekly time summary across all active ASQs and sync hours to Salesforce.
+Generate a weekly time summary across all active ASQs and sync effort (in days) to Salesforce.
 
 ## Usage
 
@@ -42,55 +42,66 @@ Determine the current ISO week number and year. Check if a weekly log exists at:
 
 If it exists, read it for any already-logged time entries this week.
 
-### 3. Estimate Hours from Activity
+### 3. Estimate Days from Activity
 
-For each active ASQ, estimate hours spent this week by reviewing:
+For each active ASQ, estimate days spent this week by reviewing:
 - Engagement History entries in the customer note dated this week
 - Any time entries in the weekly log for this ASQ
-- Present estimates to user for adjustment
+- Present estimates to user for adjustment (use day fractions, e.g., 0.5, 1, 1.5, 2)
 
 ### 4. Query Salesforce
 
-Query SF for current hours data on all active ASQs:
+Query SF for current effort data on all active ASQs:
 
 ```bash
-sf data query -q "SELECT Id, Name, Hours_Consumed__c, Total_Hours__c, Remaining_Hours_of_Investment__c, Account__r.Name FROM ApprovalRequest__c WHERE Name IN ('AR-XXX','AR-YYY')" --json
+sf data query -q "SELECT Id, Name, Actual_Effort_in_Days__c, Estimated_Duration__c, Account__r.Name FROM ApprovalRequest__c WHERE Name IN ('AR-XXX','AR-YYY')" --json
 ```
+
+Calculate remaining days as: `Estimated_Duration__c - Actual_Effort_in_Days__c`
 
 ### 5. Present Comparison Table
 
-Display a table comparing estimated vs recorded hours:
+Display a table comparing estimated vs recorded days:
 
 ```
-| ASQ ID | Customer | This Week (est) | SF Hours Used | SF Total Hours | SF Remaining | New Hours Used |
-|--------|----------|-----------------|---------------|----------------|--------------|----------------|
-| AR-XXX | TRV      | 4h              | 12.0          | 40.0           | 28.0         | 16.0           |
-| AR-YYY | ACME     | 2h              | 8.0           | 20.0           | 12.0         | 10.0           |
+| ASQ ID | Customer | This Week | SF Days Used | SF Total Days | Remaining | New Days Used |
+|--------|----------|-----------|--------------|---------------|-----------|---------------|
+| AR-XXX | NM       | 1         | 2.0          | 5.0           | 2.0       | 3.0           |
+| AR-YYY | ACME     | 0.5       | 3.0          | 10.0          | 6.5       | 3.5           |
 ```
+
+Where `New Days Used = current Actual_Effort_in_Days__c + This Week`.
 
 Allow user to adjust the "This Week" estimates before proceeding.
 
 ### 6. Confirm Salesforce Updates
 
-**CRITICAL: Always show the planned updates and wait for explicit user confirmation.**
+**CRITICAL: Always show the planned updates and wait for explicit user confirmation before writing to Salesforce.**
 
 Show each planned SF update:
 ```
 Planned Salesforce updates:
-1. AR-000106904 (TRV): Hours_Consumed__c 12.0 → 16.0
-2. AR-000107000 (ACME): Hours_Consumed__c 8.0 → 10.0
+1. AR-000106904 (NM): Actual_Effort_in_Days__c 2.0 → 3.0 (+1.0 days this week)
+2. AR-000107000 (ACME): Actual_Effort_in_Days__c 3.0 → 3.5 (+0.5 days this week)
 
-Confirm? (yes/no)
+This will update actual effort in Salesforce.
 ```
 
-Use AskUserQuestion to get confirmation.
+Use AskUserQuestion to confirm:
+- Option 1: "Update Salesforce" - proceed with the update
+- Option 2: "Adjust estimates" - let user modify the values
+- Option 3: "Skip SF update" - only update local notes/log
 
 ### 7. Update Salesforce
 
-If confirmed, update each record:
+If confirmed, update each record. The new value is cumulative:
+
+```
+new_value = current Actual_Effort_in_Days__c + this_week_days
+```
 
 ```bash
-sf data update record -s ApprovalRequest__c -i {SF_RECORD_ID} -v "Hours_Consumed__c={new_hours}"
+sf data update record -s ApprovalRequest__c -i {SF_RECORD_ID} -v "Actual_Effort_in_Days__c={new_value}"
 ```
 
 ### 8. Save to Weekly Log
@@ -100,9 +111,9 @@ Append or create the weekly log entry at `{ASQ_NOTES_ROOT}/{LOGS_DIR}/{YYYY}/{YY
 ```markdown
 ## Time Summary - Week {XX}
 
-| ASQ | Customer | Hours This Week | Total Hours Used | Remaining |
-|-----|----------|-----------------|------------------|-----------|
-| AR-XXX | TRV | 4.0 | 16.0 | 24.0 |
+| ASQ | Customer | Days This Week | Total Days Used | Remaining |
+|-----|----------|----------------|-----------------|-----------|
+| AR-XXX | NM | 1.0 | 3.0 | 2.0 |
 
 Updated in Salesforce: {timestamp}
 ```
@@ -110,7 +121,7 @@ Updated in Salesforce: {timestamp}
 ### 9. Show Completion Summary
 
 Display:
-- Total hours logged this week across all ASQs
+- Total days logged this week across all ASQs
 - Updated Salesforce records
-- Any ASQs approaching their hour limits (< 20% remaining)
+- Any ASQs approaching their day limits (< 20% of Estimated_Duration__c remaining)
 - Weekly log path
