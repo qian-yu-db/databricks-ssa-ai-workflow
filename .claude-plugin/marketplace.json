@@ -1,0 +1,20 @@
+{
+  "name": "databricks-ssa-ai-workflow",
+  "description": "ASQ automation workflows for Databricks SSAs",
+  "owner": {
+    "name": "Q Yu"
+  },
+  "plugins": [
+    {
+      "name": "asq-automation",
+      "source": "./asq-automation",
+      "description": "Automate ASQ lifecycle: intake from Salesforce, autonomous research, architecture design, status sync, and time tracking",
+      "version": "1.0.0",
+      "author": {
+        "name": "Q Yu"
+      },
+      "category": "productivity",
+      "keywords": ["asq", "salesforce", "databricks", "ssa"]
+    }
+  ]
+}
