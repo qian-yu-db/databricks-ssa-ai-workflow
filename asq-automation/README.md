@@ -11,17 +11,20 @@ Automate the full ASQ (Approval Request / Specialist SA) lifecycle in Claude Cod
 
 ## Installation
 
-### 1. Enable the plugin
+### 1. Clone the repo and install the plugin
 
-Add to your `~/.claude/settings.json` under `enabledPlugins`:
+```bash
+# Clone the repo
+git clone https://github.com/qian-yu-db/databricks-ssa-ai-workflow.git
 
-```json
-{
-  "enabledPlugins": {
-    "asq-automation@qian-yu-db/databricks-ssa-ai-workflow": true
-  }
-}
+# Register it as a Claude Code plugin marketplace
+claude plugin marketplace add /path/to/databricks-ssa-ai-workflow
+
+# Install the plugin
+claude plugin install asq-automation@databricks-ssa-ai-workflow
 ```
+
+Replace `/path/to/databricks-ssa-ai-workflow` with the actual path where you cloned the repo.
 
 ### 2. Set up your notes directory
 
