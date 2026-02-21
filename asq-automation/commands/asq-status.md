@@ -158,15 +158,24 @@ Use AskUserQuestion to confirm:
 
 ### 8. Update Salesforce (If Confirmed)
 
-First query for the record ID:
+First query for the record ID and existing notes:
 ```bash
-sf data query -q "SELECT Id FROM ApprovalRequest__c WHERE Name = '{AR ID}'" --json
+sf data query -q "SELECT Id, Request_Status_Notes__c FROM ApprovalRequest__c WHERE Name = '{AR ID}'" --json
 ```
 
-Then update:
-```bash
-sf data update record -s ApprovalRequest__c -i {RECORD_ID} -v "Request_Status_Notes__c='{status text}'"
+Extract the existing `Request_Status_Notes__c` value from the query result. Then **prepend** the new status entry on top of existing notes, separated by a newline:
+
 ```
+{new status entry}
+{existing notes}
+```
+
+Then update with the combined text:
+```bash
+sf data update record -s ApprovalRequest__c -i {RECORD_ID} -v "Request_Status_Notes__c='{new status entry}\n{existing notes}'"
+```
+
+**IMPORTANT:** Always prepend (add on top), never overwrite. This preserves the full history of status updates in the field.
 
 ### 9. Show Completion Summary
 
