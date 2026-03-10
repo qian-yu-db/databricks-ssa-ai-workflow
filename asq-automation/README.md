@@ -103,14 +103,29 @@ Then restart Claude Code.
 | `/asq-status AR-XXXXXX [--days N]` | Gather activity from Slack/Calendar/Gmail, sync to SF (default: 7 days) | sonnet |
 | `/asq-timetrack` | Weekly time summary across all active ASQs | sonnet |
 
-## Typical Workflow
+## Workflow Diagram
+
+```mermaid
+flowchart LR
+    sources["<b>Data Sources</b><br>Salesforce · Glean<br>Slack · Web<br>Calendar · Gmail"]
+    commands["<b>ASQ Commands</b><br>intake · research<br>architecture<br>status · timetrack"]
+    outputs["<b>Outputs</b><br>Customer Notes<br>Architecture Diagrams<br>Weekly Logs"]
+
+    sources -- pull context --> commands
+    commands -- generate --> outputs
+    commands -. sync back .-> sources
+
+    classDef box fill:#f8f9fa,stroke:#495057,color:#212529
+    class sources,commands,outputs box
+```
+
+### Typical Usage
 
 ```
 1. /asq-intake AR-000106904        # Create customer note from Salesforce
 2. /asq-research AR-000106904      # Research the engagement topic
-3. /asq-architecture AR-000106904  # Design the solution after HITL iteration of step 2
-4. /asq-status AR-000106904        # Status update (last 7 days)
-   /asq-status AR-000106904 --days 14  # Or look back further
+3. /asq-architecture AR-000106904  # Design the solution (HITL iteration)
+4. /asq-status AR-000106904        # Status update (repeat as needed)
 5. /asq-timetrack                  # End-of-week time sync
 ```
 

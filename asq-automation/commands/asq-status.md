@@ -134,7 +134,8 @@ Compose a concise status update for the `Request_Status_Notes__c` field based on
 
 Format as a dated entry:
 ```
-{YYYY-MM-DD}: {Concise status summary. Key activities, outcomes, and next steps.}
+{YYYY-MM-DD}: [{User Name}] {Concise status summary, key activities, outcomes, and next steps.}
+
 ```
 
 ### 7. Confirm Salesforce Update
@@ -163,16 +164,17 @@ First query for the record ID and existing notes:
 sf data query -q "SELECT Id, Request_Status_Notes__c FROM ApprovalRequest__c WHERE Name = '{AR ID}'" --json
 ```
 
-Extract the existing `Request_Status_Notes__c` value from the query result. Then **prepend** the new status entry on top of existing notes, separated by a newline:
+Extract the existing `Request_Status_Notes__c` value from the query result. Then **prepend** the new status entry on top of existing notes, separated by a **blank line**:
 
 ```
 {new status entry}
+
 {existing notes}
 ```
 
 Then update with the combined text:
 ```bash
-sf data update record -s ApprovalRequest__c -i {RECORD_ID} -v "Request_Status_Notes__c='{new status entry}\n{existing notes}'"
+sf data update record -s ApprovalRequest__c -i {RECORD_ID} -v "Request_Status_Notes__c='{new status entry}\n\n{existing notes}'"
 ```
 
 **IMPORTANT:** Always prepend (add on top), never overwrite. This preserves the full history of status updates in the field.
