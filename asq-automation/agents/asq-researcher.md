@@ -33,14 +33,24 @@ Read the full customer note at the provided file path. Extract:
 
 ### Step 2: Search Internal Knowledge (Glean)
 
-Search Glean for relevant internal resources:
+Search Glean for relevant internal resources. **Always filter to recent content (last year) and deprioritize anything older than 6 months:**
 
 ```
 glean_read_api_call("search.query", {
     "query": "{technical keywords} {Databricks service} architecture guide",
-    "pageSize": 10
+    "page_size": 20,
+    "request_options": {
+        "facetFilters": [
+            {
+                "fieldName": "last_updated_at",
+                "values": [{"value": "past_year", "relationType": "EQUALS"}]
+            }
+        ]
+    }
 })
 ```
+
+**Recency rule:** When reviewing results, deprioritize or skip any document last updated more than 6 months ago. Prefer the most recently updated version when multiple versions of the same document exist.
 
 Search for:
 1. **Architecture guides** matching the technical domain
